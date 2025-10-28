@@ -3,6 +3,7 @@ import tinycolor from "tinycolor2";
 const H = (c) => tinycolor(c).toHexString().toUpperCase();
 
 export function analogic(seed, count = 5, angle = 30) {
+  // angle здесь — параметр slices tinycolor. Ок.
   return tinycolor(seed).analogous(count, angle).map(H).slice(0, count);
 }
 
@@ -19,12 +20,15 @@ export function triad(seed, count = 5) {
 export function complement(seed, count = 5) {
   const base = tinycolor(seed);
   const comp = base.complement();
-  const extra = [base.lighten(30), base.darken(18), comp.lighten(18)].map(H);
+  const extra = [
+    base.clone().lighten(30),
+    base.clone().darken(18),
+    comp.clone().lighten(18),
+  ].map(H);
   return [H(base), H(comp), ...extra].slice(0, count);
 }
 
 export function quad(seed, count = 5) {
-  // tetrad
   const arr = tinycolor(seed).tetrad().map(H);
   const extra = H(tinycolor(seed).lighten(24));
   return [...arr, extra].slice(0, count);
@@ -33,15 +37,15 @@ export function quad(seed, count = 5) {
 export function monochromeLight(seed, count = 5) {
   // светлая шкала для фонов/поверхностей
   const base = tinycolor(seed).desaturate(40);
-  const steps = [46, 38, 30, 22, 14]; // чем выше — светлее
-  return steps.slice(0, count).map((n) => H(base.lighten(n)));
+  const steps = [46, 38, 30, 22, 14];
+  return steps.slice(0, count).map((n) => H(base.clone().lighten(n)));
 }
 
 export function monochromeDark(seed, count = 5) {
   // тёмная шкала для dark mode
   const base = tinycolor(seed).desaturate(30);
-  const steps = [40, 28, 20, 12, 6]; // чем выше — темнее
-  return steps.slice(0, count).map((n) => H(base.darken(n)));
+  const steps = [40, 28, 20, 12, 6];
+  return steps.slice(0, count).map((n) => H(base.clone().darken(n)));
 }
 
 export function getLocalScheme(seed, mode, count = 5) {

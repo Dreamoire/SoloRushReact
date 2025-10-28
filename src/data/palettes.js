@@ -1,5 +1,42 @@
 export const palettes = [
   {
+    id: "low",
+    title: "Low contrast",
+    description: "Échelle de faible contraste.",
+    colors: [],
+  },
+  {
+    id: "light",
+    title: "Light contrast",
+    description: "Échelle claire pour UI lumineuse.",
+    colors: [],
+  },
+  {
+    id: "moderate",
+    title: "Moderate contrast",
+    description: "Contraste moyen polyvalent.",
+    colors: [],
+  },
+  {
+    id: "medium",
+    title: "Medium contrast",
+    description: "Équilibre lisibilité / douceur.",
+    colors: [],
+  },
+  {
+    id: "high",
+    title: "High contrast",
+    description: "Lisibilité maximale.",
+    colors: [],
+  },
+  {
+    id: "dark-value",
+    title: "Dark value scale",
+    description: "Échelle sombre pour dark mode.",
+    colors: [],
+  },
+
+  {
     id: "energy",
     title: "Energy",
     description:
@@ -50,7 +87,7 @@ export const palettes = [
   },
   {
     id: "pro",
-    title: "Professionnal",
+    title: "Professional",
     description:
       "Teintes neutres et harmonieuses, adaptées aux environnements d’entreprise et aux interfaces sobres.",
     colors: ["#ECECEC", "#B0BEC5", "#78909C", "#455A64", "#263238"],

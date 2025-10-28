@@ -3,8 +3,13 @@ export default function PaletteCard({
 	liked = false,
 	onToggleLike = () => {},
 	onCopy = () => {},
-	copied = false, // <<< добавить
+	copied = false,
 }) {
+	const colors = (palette.colors ?? []).slice(0, 6);
+	while (colors.length < 6) {
+		colors.push(colors[colors.length - 1] ?? "#FFFFFF");
+	}
+
 	return (
 		<article className="palette-card">
 			<header>
@@ -25,7 +30,7 @@ export default function PaletteCard({
 					<button
 						type="button"
 						className={`btn copy ${copied ? "copied" : ""}`}
-						onClick={() => onCopy(palette.colors)}
+						onClick={() => onCopy?.("hex")}
 					>
 						<span className="copy-text">{copied ? "Copié" : "Copier"}</span>
 					</button>
@@ -33,12 +38,16 @@ export default function PaletteCard({
 			</header>
 
 			<div className="colors">
-				{palette.colors.map((c) => (
-					<div key={c} className="color-block" style={{ backgroundColor: c }} />
+				{colors.map((c, i) => (
+					<div
+						key={`${palette.id}-${i}`}
+						className="color-block"
+						style={{ backgroundColor: c }}
+					/>
 				))}
 			</div>
 
-			<div className="hex-row">{palette.colors.join(", ")}</div>
+			<div className="hex-row">{colors.join(", ")}</div>
 		</article>
 	);
 }

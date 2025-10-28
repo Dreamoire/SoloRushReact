@@ -1,55 +1,63 @@
 import tinycolor from "tinycolor2";
-import { ensureContrast, textOn, ratio } from "./contrast";
+import { textOn, contrastRatio } from "./contrast";
 
-// style: "minimal" | "dark" | "energy" ... можно подстраивать позже
+function ensureContrast(bg, fg, min = 4.5, direction = "auto") {
+  let c = tinycolor(bg);
+  const fgHex = tinycolor(fg).toHexString();
+  let guard = 0;
+
+  while (contrastRatio(c.toHexString(), fgHex) < min && guard < 60) {
+    if (direction === "lighter") c = c.lighten(2);
+    else if (direction === "darker") c = c.darken(2);
+    else c = c.isLight() ? c.darken(2) : c.lighten(2);
+    guard++;
+  }
+  return c.toHexString().toUpperCase();
+}
+
+// --- light UI ---
 export function buildWebPalette(seedHex, style = "default") {
   const seed = tinycolor(seedHex);
 
-  // 1) Тональная база вокруг seed
-  const primary = seed.saturate(10); // самый насыщенный
-  const surface = seed.desaturate(40).lighten(30); // карточки
-  const bg = seed.desaturate(60).lighten(42); // общий фон
-  const muted = seed.desaturate(30).lighten(15); // вторичный
+  const primary = seed.saturate(10);
+  const surface = seed.desaturate(40).lighten(30);
+  const bg = seed.desaturate(60).lighten(42);
+  const muted = seed.desaturate(30).lighten(15);
 
-  // 2) Гарантируем читаемость
   const text = textOn(bg, 4.5);
   const textOnSurface = textOn(surface, 4.5);
   const onPrimary = textOn(primary, 4.5);
 
-  // подстраховка: если фон слишком тёмный/светлый — двинем его к центру
   const bgSafe =
-    ratio(text, bg) < 4.5
-      ? tinycolor(ensureContrast(bg, text, 4.5, "lighter")).toHexString()
-      : bg.toHexString();
-  const surfSafe =
-    ratio(textOnSurface, surface) < 4.5
-      ? tinycolor(
-          ensureContrast(surface, textOnSurface, 4.5, "lighter")
-        ).toHexString()
-      : surface.toHexString();
+    contrastRatio(text, bg) < 4.5
+      ? ensureContrast(bg, text, 4.5, "lighter")
+      : bg.toHexString().toUpperCase();
 
-  // 3) Выход: 5 свотчей для твоей карточки + роли
+  const surfSafe =
+    contrastRatio(textOnSurface, surface) < 4.5
+      ? ensureContrast(surface, textOnSurface, 4.5, "lighter")
+      : surface.toHexString().toUpperCase();
+
   return {
     roles: {
-      bg: bgSafe.toUpperCase(),
-      surface: surfSafe.toUpperCase(),
-      text: text,
+      bg: bgSafe,
+      surface: surfSafe,
+      text,
       muted: muted.toHexString().toUpperCase(),
       primary: primary.toHexString().toUpperCase(),
       onPrimary,
     },
-    // массив из пяти цветов под текущий UI-вид
     swatches: [
-      primary.toHexString().toUpperCase(), // 1 — Primary (самый яркий)
-      muted.toHexString().toUpperCase(), // 2 — Muted/Accent
-      surfSafe.toUpperCase(), // 3 — Surface
-      textOnSurface, // 4 — Text on surface
-      bgSafe.toUpperCase(), // 5 — Background
+      primary.toHexString().toUpperCase(),
+      muted.toHexString().toUpperCase(),
+      surfSafe,
+      textOnSurface,
+      bgSafe,
     ],
   };
 }
 
-// вариант для «dark mode»
+// --- dark UI ---
 export function buildDarkPalette(seedHex) {
   const seed = tinycolor(seedHex);
 
@@ -62,14 +70,13 @@ export function buildDarkPalette(seedHex) {
   const text = textOn(bg, 4.5);
   const textOnSurface = textOn(surface, 4.5);
 
-  // «страховка» контраста как в светлой версии
   const bgSafe =
-    ratio(text, bg.toHexString()) < 4.5
+    contrastRatio(text, bg) < 4.5
       ? ensureContrast(bg, text, 4.5, "auto")
       : bg.toHexString().toUpperCase();
 
   const surfSafe =
-    ratio(textOnSurface, surface.toHexString()) < 4.5
+    contrastRatio(textOnSurface, surface) < 4.5
       ? ensureContrast(surface, textOnSurface, 4.5, "auto")
       : surface.toHexString().toUpperCase();
 
@@ -90,4 +97,91 @@ export function buildDarkPalette(seedHex) {
       bgSafe,
     ],
   };
+}
+
+export function buildValueContrast(seedHex, level) {
+  const s = tinycolor(seedHex);
+  const scales = {
+    low: [-8, -4, 0, 4, 8, 12],
+    light: [6, 10, 14, 18, 22, 26],
+    moderate: [-16, -8, 0, 8, 16, 24],
+    medium: [-22, -14, -6, 6, 14, 22],
+    high: [-30, -20, -10, 10, 20, 30],
+    "dark-value": [-34, -28, -22, -16, -10, -4],
+  };
+  return (scales[level] ?? scales.moderate).map((v) =>
+    s.clone().lighten(v).toHexString().toUpperCase()
+  );
+}
+
+// --- Itten-like contrast types for Base ---
+export function buildContrastByType(seedHex, type = "light-dark") {
+  const s = tinycolor(seedHex);
+
+  const toHEX = (arr) =>
+    arr.map((c) => tinycolor(c).toHexString().toUpperCase());
+
+  switch (type) {
+    case "light-dark": {
+      const steps = [-22, -10, -4, 6, 14, 22];
+      return toHEX(steps.map((v) => s.clone().lighten(v)));
+    }
+    case "cold-warm": {
+      const h = s.toHsl().h || 0;
+      const cold = tinycolor({ h: (h + 200) % 360, s: 0.6, l: 0.55 });
+      const warm = tinycolor({ h: (h + 30) % 360, s: 0.7, l: 0.55 });
+      return toHEX([
+        cold.clone().saturate(10),
+        cold.clone().lighten(10),
+        cold.clone().desaturate(15),
+        warm.clone().desaturate(10),
+        warm.clone().lighten(8),
+        warm.clone().saturate(10),
+      ]);
+    }
+    case "complementary": {
+      const comp = s.clone().complement();
+      return toHEX([
+        s.clone().saturate(20),
+        s.clone().lighten(10),
+        s.clone().desaturate(20),
+        comp.clone().desaturate(20),
+        comp.clone().lighten(10),
+        comp.clone().saturate(20),
+      ]);
+    }
+    case "simultaneous": {
+      const neutral = s.clone().desaturate(80).lighten(35);
+      const comp = s.clone().complement();
+      return toHEX([
+        neutral.clone().darken(10),
+        neutral,
+        neutral.clone().lighten(10),
+        s.clone().saturate(30),
+        comp.clone().saturate(30),
+        neutral.clone().lighten(18),
+      ]);
+    }
+    case "saturation": {
+      const base = s.clone();
+      const l = base.toHsl().l;
+      return toHEX(
+        [
+          base.clone().desaturate(80).setAlpha(1).toHslString(),
+          base.clone().desaturate(50).toHslString(),
+          base.clone().desaturate(20).toHslString(),
+          base.clone().saturate(10).toHslString(),
+          base.clone().saturate(30).toHslString(),
+          base.clone().saturate(50).toHslString(),
+        ].map((c) => tinycolor(c).setAlpha(1).toHexString())
+      );
+    }
+    case "extension": {
+      const a = s.clone().saturate(25).lighten(5);
+      const b = s.clone().complement().darken(5);
+      return toHEX([a, b, b, a, b, b]);
+    }
+    default:
+      return toHEX([-22, -10, -4, 6, 14, 22].map((v) => s.clone().lighten(v)));
+  }
 }

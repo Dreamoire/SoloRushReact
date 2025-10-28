@@ -1,16 +1,22 @@
 /* ========== VARIABLES ========== */
+@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@700;800&family=Rubik:wght@400;600;700;800&display=swap");
 :root {
-	--bg: #455975;
-	--text: #222;
-	--primary: #f6f059;
-	--card-bg: #fff;
+	--cy1: #ff2fb2;
+	--cy2: #7a00ff;
+	--cy3: #00ffff;
+	--cy4: #00ff85;
+	--cy5: #ff6c00;
+	--cy6: #0a0015;
+	--bg: #0a0015;
+	--card-bg: #ffffff;
+	--text: #0a0015;
 }
 
 /* ========== GLOBAL ========== */
 body {
-	font-family: "Inter", sans-serif;
-	background-color: var(--bg);
-	color: var(--text);
+	font-family: "Rubik", system-ui, sans-serif;
+	background: #1a1d22;
+	color: #ffffff;
 	margin: 0;
 	padding: 2rem;
 }
@@ -19,32 +25,56 @@ body {
 main {
 	max-width: 1000px;
 	margin: 0 auto;
+	text-align: center;
+}
+
+form {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	justify-content: center;
 }
 
 h1 {
+	font-family: "Raleway", system-ui, sans-serif;
+	font-weight: 800;
+	color: #00ff85;
 	text-align: center;
-	color: var(--primary);
+	margin: 0 0 12px;
+}
+h2 {
+	font-family: "Rubik", system-ui, sans-serif;
+	font-weight: 800;
+	color: #bd68d1;
+	text-align: center;
+	margin: 24px 0 8px;
 }
 
 /* ========== PALETTE CARDS ========== */
-.palette-card {
+.palette-card,
+.insp-card {
 	background: var(--card-bg);
+	color: var(--text);
 	border-radius: 12px;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-	padding: 1rem;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	padding: 12px;
 	margin: 1rem 0;
+	text-align: left;
 }
 
-.colors {
-	display: flex;
-	gap: 6px;
+.colors,
+.insp-row {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	gap: 8px;
 }
 
-.color-block {
-	width: 50px;
-	height: 50px;
-	border-radius: 6px;
+.color-block,
+.sw {
+	height: 44px;
+	border-radius: 10px;
 	border: 1px solid #ccc;
+	background: var(--c);
 }
 
 .grid {
@@ -53,27 +83,25 @@ h1 {
 	gap: 16px;
 }
 
-.palette-card {
-	background: var(--card-bg);
-	border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-	padding: 12px;
-}
-
-.palette-card header {
+.palette-card header,
+.insp-card header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 8px;
 }
 
-.palette-title {
-	font-weight: 600;
+.palette-title,
+.insp-title {
+	font-family: "Rubik", system-ui, sans-serif;
+	font-weight: 700;
+	color: var(--text);
 }
 
 .actions {
 	display: flex;
 	gap: 8px;
+	justify-content: flex-end;
 }
 
 .btn {
@@ -163,7 +191,6 @@ h1 {
 	background: #f5f5f5;
 	border: 1px solid #ccc;
 	color: #222;
-	cursor: pointer;
 	transition: all 0.3s ease;
 	padding: 4px 10px;
 	border-radius: 6px;
@@ -171,15 +198,110 @@ h1 {
 }
 
 .btn.copy.copied {
-	background: #000; /* черная */
-	color: #fff; /* текст белый */
+	background: #000;
+	color: #fff;
 	border-color: #000;
 	position: relative;
 }
 
 .btn.copy.copied::after {
 	content: "✔";
-	color: #39ff14; /* ярко-зеленая галочка */
+	color: #39ff14;
 	font-weight: bold;
 	margin-left: 6px;
+}
+
+.insp {
+	padding: 24px 0;
+}
+.insp-grid {
+	display: grid;
+	gap: 16px;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.insp-title {
+	position: relative;
+	display: inline-block;
+	cursor: help;
+}
+.insp-desc {
+	margin: 0 0 10px;
+	font-size: 0.95rem;
+	color: #555;
+}
+.insp-row {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	gap: 8px;
+}
+.sw {
+	height: 42px;
+	border-radius: 10px;
+	background: var(--c);
+}
+.colorpicker-section {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	margin-top: 12px;
+}
+.insp-card.tooltip-parent {
+	position: relative;
+}
+
+.insp-card .tooltip {
+	top: auto;
+	bottom: 90%;
+	left: 0;
+	transform: translateY(-6px);
+	z-index: 20;
+	background: #00ff85;
+	color: #0a0015;
+}
+
+.insp-card:hover .tooltip,
+.insp-card:focus-within .tooltip {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.insp-title .tooltip {
+	position: absolute;
+	bottom: 130%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-6px);
+	background: #00ff85;
+	color: #0a0015;
+	border-radius: 8px;
+	padding: 8px 12px;
+	font-size: 13px;
+	font-weight: 500;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+	white-space: normal;
+	width: auto;
+	max-width: 280px;
+	opacity: 0;
+	pointer-events: none;
+	transition:
+		opacity 0.15s ease,
+		transform 0.15s ease;
+	z-index: 30;
+}
+
+.insp-title:hover .tooltip,
+.insp-title:focus-within .tooltip {
+	opacity: 1;
+	transform: translateX(-50%) translateY(-10px);
+}
+
+.insp-title .tooltip::after {
+	content: "";
+	position: absolute;
+	bottom: -6px;
+	left: 50%;
+	transform: translateX(-50%);
+	border: 6px solid transparent;
+	border-top-color: #00ff85;
 }

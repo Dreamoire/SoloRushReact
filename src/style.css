@@ -1,0 +1,99 @@
+:root {
+	--gap: 16px;
+	--bg: #0b0b10;
+	--paper: #fff;
+}
+body {
+	margin: 0;
+	background: #0a0015;
+	color: #ffffff;
+	font:
+		16px / 1.5 "Rubik",
+		system-ui,
+		sans-serif;
+}
+
+.layout {
+	display: grid;
+	grid-template-columns: 280px 1fr;
+	grid-template-areas: "ctl main" "toggle main" "guided guided";
+	gap: var(--gap);
+	padding: 24px;
+}
+@media (max-width: 900px) {
+	.layout {
+		grid-template-columns: 1fr;
+		grid-template-areas: "ctl" "main" "toggle" "guided";
+	}
+}
+
+.controls {
+	grid-area: ctl;
+	position: sticky;
+	top: 16px;
+	align-self: start;
+	background: var(--paper);
+	border-radius: 12px;
+	padding: 16px;
+}
+.grid {
+	grid-area: main;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: var(--gap);
+}
+.card {
+	background: var(--paper);
+	border-radius: 14px;
+	padding: 12px;
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+.card header {
+	font-weight: 600;
+	margin-bottom: 10px;
+}
+
+.swatches {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	gap: 8px;
+}
+.sw {
+	display: block;
+	height: 44px;
+	border-radius: 10px;
+	background: var(--c);
+}
+
+/* extension: варьируем визуальный вес ячеек */
+.swatches[data-contrast="extension"] .sw:nth-child(1) {
+	grid-column: span 2;
+}
+.swatches[data-contrast="extension"] .sw:nth-child(2) {
+	grid-column: span 1;
+}
+.swatches[data-contrast="extension"] .sw:nth-child(3) {
+	grid-column: span 1;
+}
+.swatches[data-contrast="extension"] .sw:nth-child(4) {
+	grid-column: span 1;
+}
+.swatches[data-contrast="extension"] .sw:nth-child(5) {
+	grid-column: span 1;
+}
+.swatches[data-contrast="extension"] .sw:nth-child(6) {
+	grid-column: span 2;
+}
+
+.guidedToggle {
+	grid-area: toggle;
+}
+.guided {
+	grid-area: guided;
+	display: none;
+}
+.guided.open {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: var(--gap);
+}

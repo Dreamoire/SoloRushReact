@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
+
 import chromosphereLogo from "./assets/chromosphere-logo.png";
+
 import ColorPicker from "./components/ColorPicker";
 import InspirationPalettes from "./components/InspirationPalettes";
 import PaletteCard from "./components/PaletteCard";
+
 import { palettes as STATIC } from "./data/palettes";
+
 import {
 	buildCozy,
 	buildDarkMode,
@@ -15,9 +19,10 @@ import {
 	buildProfessional,
 	normalizeGuided,
 } from "./lib/categorySchemes";
+
 import { fetchScheme, MODE_BY_CATEGORY } from "./lib/colorApi";
-import { getLocalScheme } from "./lib/localSchemes";
 import { buildContrastByType } from "./lib/contrast";
+import { getLocalScheme } from "./lib/localSchemes";
 
 const BASE_IDS = ["low", "light", "moderate", "medium", "high", "dark-value"];
 

@@ -1,4 +1,5 @@
 import { buildPalette } from "../lib/paletteEngine";
+import PaletteCard from "./PaletteCard";
 
 export default function PaletteGrid({ seed, contrast, schemes }) {
 	return (

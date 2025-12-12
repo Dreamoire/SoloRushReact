@@ -1,22 +1,37 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import chromosphereLogo from "./assets/chromosphere-logo.png";
+import ColorPicker from "./components/ColorPicker";
+import InspirationPalettes from "./components/InspirationPalettes";
+import PaletteCard from "./components/PaletteCard";
 import { palettes as STATIC } from "./data/palettes";
-import { fetchScheme, MODE_BY_CATEGORY } from "./lib/colorApi";
-import { getLocalScheme } from "./lib/localSchemes";
-import { buildValueContrast, buildContrastByType } from "./lib/paletteEngine";
 import {
-	buildDarkMode,
-	buildFuturiste,
 	buildCozy,
-	buildLuxe,
-	buildProfessional,
-	buildMinimalist,
+	buildDarkMode,
 	buildEnergy,
+	buildFuturiste,
 	buildKiddo,
+	buildLuxe,
+	buildMinimalist,
+	buildProfessional,
 	normalizeGuided,
 } from "./lib/categorySchemes";
-import ColorPicker from "./components/ColorPicker";
-import PaletteCard from "./components/PaletteCard";
-import InspirationPalettes from "./components/InspirationPalettes";
+import { fetchScheme, MODE_BY_CATEGORY } from "./lib/colorApi";
+import { getLocalScheme } from "./lib/localSchemes";
+import { buildContrastByType } from "./lib/contrast";
+
+const BASE_IDS = ["low", "light", "moderate", "medium", "high", "dark-value"];
+
+const MOD_IDS = [
+	"pro",
+	"dark",
+	"minimal",
+	"cozy",
+	"future",
+	"energy",
+	"nature",
+	"luxe",
+	"kiddo",
+];
 
 export default function App() {
 	const [hex, setHex] = useState("#FF6600");
@@ -30,21 +45,6 @@ export default function App() {
 		onOk();
 	}, []);
 
-	const BASE_IDS = ["low", "light", "moderate", "medium", "high", "dark-value"];
-
-	const MOD_IDS = [
-		"pro",
-		"dark",
-		"minimal",
-		"cozy",
-		"future",
-		"energy",
-		"nature",
-		"luxe",
-		"kiddo",
-	];
-
-	// --- copier ---
 	function handleCopy(paletteId, colors, format = "hex") {
 		let txt = "";
 		if (format === "hex") txt = colors.join(", ");
@@ -63,7 +63,7 @@ export default function App() {
 		return /^[0-9A-F]{6}$/.test(x) ? `#${x}` : null;
 	};
 
-	async function onOk() {
+	async function onOk(nextContrastType = contrastType) {
 		const v = normHex(input);
 		if (!v) return alert("HEX invalide. Exemple: #1A2B3C");
 		setHex(v);
@@ -71,7 +71,10 @@ export default function App() {
 		const tasks = STATIC.map(async (p) => {
 			if (BASE_IDS.includes(p.id)) {
 				const strength = p.id === "dark-value" ? "dark" : p.id;
-				return { ...p, colors: buildContrastByType(v, contrastType, strength) };
+				return {
+					...p,
+					colors: buildContrastByType(v, nextContrastType, strength),
+				};
 			}
 			if (p.id === "dark")
 				return { ...p, colors: normalizeGuided("dark", v, buildDarkMode(v)) };
@@ -118,16 +121,13 @@ export default function App() {
 
 	return (
 		<main>
-			<h1>Chromosphère : Générateur de palettes</h1>
+			<header className="site-header">
+				<img className="site-logo" src={chromosphereLogo} alt="Chromosphère" />
+				<h1 className="site-title">Générateur de palettes</h1>
+			</header>
+
 			<InspirationPalettes />
 			<h2>Génération de palettes à partir d’une couleur de base</h2>
-			<form
-				onSubmit={(e) => {
-					e.preventDefault();
-					onOk();
-				}}
-				style={{ display: "flex", gap: 8, alignItems: "center" }}
-			></form>
 
 			<form
 				onSubmit={(e) => {
@@ -143,7 +143,11 @@ export default function App() {
 				/>
 				<select
 					value={contrastType}
-					onChange={(e) => setContrastType(e.target.value)}
+					onChange={(e) => {
+						const next = e.target.value;
+						setContrastType(next);
+						onOk(next);
+					}}
 				>
 					<option value="light-dark">Light-dark contrast</option>
 					<option value="cold-warm">Cold-warm contrast</option>
@@ -177,7 +181,7 @@ export default function App() {
 			<div style={{ display: "flex", gap: 8, marginTop: 24 }}>
 				<button
 					type="button"
-					className="btn"
+					className="insp-toggle"
 					onClick={() => setShowMods(!showMods)}
 				>
 					{showMods

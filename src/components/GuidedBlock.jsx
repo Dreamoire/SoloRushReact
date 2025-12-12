@@ -1,13 +1,13 @@
-import { INSPIRATION } from "../data/inspirationPalettes";
+import { GUIDED } from "../data/guided";
 
 export default function GuidedBlock({ open }) {
 	return (
 		<section className={`guided ${open ? "open" : ""}`}>
-			{INSPIRATION.map((p) => (
+			{GUIDED.map((p) => (
 				<article key={p.id} className="card">
 					<header>{p.name}</header>
 					<div className="swatches">
-						{p.colors.map((c, i) => (
+						{p.colors.map((c) => (
 							<span key={c} className="sw" style={{ "--c": c }} />
 						))}
 					</div>

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
 import iro from "@jaames/iro";
+import { useEffect, useRef } from "react";
 
 export default function ColorPicker({ value = "#FF6600", onChange }) {
 	const containerRef = useRef(null);

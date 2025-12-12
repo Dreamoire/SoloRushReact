@@ -1,7 +1,5 @@
 export default function PaletteCard({
 	palette,
-	liked = false,
-	onToggleLike = () => {},
 	onCopy = () => {},
 	copied = false,
 }) {
@@ -12,21 +10,15 @@ export default function PaletteCard({
 
 	return (
 		<article className="palette-card">
-			<header>
+			<header className="palette-card__header">
 				<span className="palette-title tooltip-parent">
 					{palette.title}
 					<span className="tooltip" role="tooltip">
 						{palette.description}
 					</span>
 				</span>
+
 				<div className="actions">
-					<button
-						type="button"
-						className={`btn like ${liked ? "active" : ""}`}
-						onClick={() => onToggleLike(palette.id)}
-					>
-						❤️
-					</button>
 					<button
 						type="button"
 						className={`btn copy ${copied ? "copied" : ""}`}
@@ -37,17 +29,17 @@ export default function PaletteCard({
 				</div>
 			</header>
 
-			<div className="colors">
+			<div className="gen-lines">
 				{colors.map((c, i) => (
 					<div
-						key={`${palette.id}-${i}`}
-						className="color-block"
-						style={{ backgroundColor: c }}
-					/>
+						key={`${palette.id}-${c}-${i}`}
+						className="gen-line"
+						style={{ "--sw": c }}
+					>
+						<span className="gen-line-label">{c}</span>
+					</div>
 				))}
 			</div>
-
-			<div className="hex-row">{colors.join(", ")}</div>
 		</article>
 	);
 }
